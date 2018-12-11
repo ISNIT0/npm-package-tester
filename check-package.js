@@ -28,8 +28,8 @@ Package check passed on Travis.
 `
         }, null, '\t');
         await repo.writeFile('master', reportDirectory, reportContent, `:tada: Automatically applying 'C' grade`, {});
-        
-        await axios.get(`https://safenpm.herokuapp.com/update/${WEBHOOK_TOKEN}/${package.packageName}/${version}`);
+
+        await axios.get(`https://safenpm.herokuapp.com/update/${WEBHOOK_TOKEN}/${package.packageName}/${package.version}`);
     })
     .catch(async (diffs) => {
         console.error(`Package failed the check`, diffs)
@@ -48,7 +48,11 @@ ${JSON.stringify(diffs, null, '\t')}
         await repo.writeFile('master', reportDirectory, reportContent, `:rotating_light: Automatically applying 'F' grade`, {});
 
 
-        await axios.get(`https://safenpm.herokuapp.com/update/${WEBHOOK_TOKEN}/${package.packageName}/${version}`);
+        await axios.get(`https://safenpm.herokuapp.com/update/${WEBHOOK_TOKEN}/${package.packageName}/${package.version}`);
+    })
+    .catch(err => {
+        console.error(`Died with:`, err);
+        process.exit(1);
     })
 
 function getPackageVersionUrl(package, version) {
