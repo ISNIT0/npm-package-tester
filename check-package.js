@@ -11,9 +11,11 @@ const package = require('./test.json');
 doCheck(package)
     .then(() => {
         console.log(`Successfully checked packages and saved output`);
+        process.exit(0);
     })
     .catch((err) => {
         console.error(`Failed to check packages`, err)
+        process.exit(1);
     })
     .then(() => {
         // TODO: Callback to update DB
