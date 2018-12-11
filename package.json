@@ -1,0 +1,27 @@
+{
+  "name": "npm-package-tester",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node check-package.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ISNIT0/npm-package-tester.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ISNIT0/npm-package-tester/issues"
+  },
+  "homepage": "https://github.com/ISNIT0/npm-package-tester#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "crypto": "^1.0.1",
+    "diff": "^3.5.0",
+    "graceful-fs": "^4.1.15",
+    "simple-git": "^1.107.0",
+    "uuid": "^3.3.2"
+  }
+}
