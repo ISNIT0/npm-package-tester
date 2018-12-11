@@ -29,8 +29,8 @@ Package check passed on Travis.
         }, null, '\t');
         return repo.writeFile('master', reportDirectory, reportContent, `:tada: Automatically applying 'C' grade`, {});
     })
-    .catch((err) => {
-        console.error(`Package failed the check`, err)
+    .catch((diffs) => {
+        console.error(`Package failed the check`, diffs)
         const reportContent = JSON.stringify({
             grade: 'C',
             comments: `:robot:
@@ -39,7 +39,7 @@ Package check failed on Travis.
 [see more](https://travis-ci.org/ISNIT0/npm-package-tester/branches)
 
 \`\`\`
-${JSON.stringify(err, null, '\t')}
+${JSON.stringify(diffs, null, '\t')}
 \`\`\`
 `
         }, null, '\t');
@@ -94,12 +94,12 @@ async function doCheck({ packageName, version }) {
         const validDiffs = diff.filter(d => d.diff.length);
         if (validDiffs.length) {
             console.error(`Diffs for [${packageName}]`, JSON.stringify(validDiffs, null, '\t'));
-            throw new Error(`Failed to automatically verify [${packageName}], see logs for diff`);
+            throw validDiffs;
         }
 
-    } catch (err) {
-        console.error(`Error verifying [${packageName}]:`, err);
-        throw err;
+    } catch (diffs) {
+        console.error(`Error verifying [${packageName}], diffs:`, diffs);
+        throw diffs;
     } finally {
         console.info(`Clearing up [${packageName}]`);
         // await deleteDir(dirPath);
