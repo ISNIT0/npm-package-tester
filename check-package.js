@@ -9,7 +9,7 @@ const _exec = require('child_process').exec;
 const package = require('./test.json');
 const Repository = require('github-api/dist/components/Repository');
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const { WEBHOOK_TOKEN, GITHUB_TOKEN } = process.env;
 const repo = new Repository('ISNIT0/safe-npm-packages', {
     token: GITHUB_TOKEN
 });
@@ -17,7 +17,7 @@ const repo = new Repository('ISNIT0/safe-npm-packages', {
 const reportDirectory = `reports/${package.packageName}/${package.version}.json`;
 
 doCheck(package)
-    .then(() => {
+    .then(async () => {
         console.log(`Package passed the check`);
         const reportContent = JSON.stringify({
             grade: 'C',
@@ -27,9 +27,11 @@ Package check passed on Travis.
 [see more](https://travis-ci.org/ISNIT0/npm-package-tester/branches)
 `
         }, null, '\t');
-        return repo.writeFile('master', reportDirectory, reportContent, `:tada: Automatically applying 'C' grade`, {});
+        await repo.writeFile('master', reportDirectory, reportContent, `:tada: Automatically applying 'C' grade`, {});
+        
+        await axios.get(`https://safenpm.herokuapp.com/update/${WEBHOOK_TOKEN}/${package.packageName}/${version}`);
     })
-    .catch((diffs) => {
+    .catch(async (diffs) => {
         console.error(`Package failed the check`, diffs)
         const reportContent = JSON.stringify({
             grade: 'C',
@@ -43,7 +45,10 @@ ${JSON.stringify(diffs, null, '\t')}
 \`\`\`
 `
         }, null, '\t');
-        return repo.writeFile('master', reportDirectory, reportContent, `:rotating_light: Automatically applying 'F' grade`, {});
+        await repo.writeFile('master', reportDirectory, reportContent, `:rotating_light: Automatically applying 'F' grade`, {});
+
+
+        await axios.get(`https://safenpm.herokuapp.com/update/${WEBHOOK_TOKEN}/${package.packageName}/${version}`);
     })
 
 function getPackageVersionUrl(package, version) {
