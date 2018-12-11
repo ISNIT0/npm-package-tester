@@ -7,19 +7,44 @@ const diff = require('diff');
 const path = require('path');
 const _exec = require('child_process').exec;
 const package = require('./test.json');
+const Repository = require('github-api/dist/components/Repository');
+
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const repo = new Repository('ISNIT0/safe-npm-packages', {
+    token: GITHUB_TOKEN
+});
+
+const reportDirectory = `reports/${package.packageName}/${package.version}.json`;
 
 doCheck(package)
     .then(() => {
         console.log(`Package passed the check`);
-        return 0;
+        const reportContent = JSON.stringify({
+            grade: 'C',
+            comments: `:robot:
+Package check passed on Travis.
+
+[see more](https://travis-ci.org/ISNIT0/npm-package-tester/branches)
+`
+        }, null, '\t');
+        return repo.writeFile('master', reportDirectory, reportContent, `:tada: Automatically applying 'C' grade`, {});
     })
     .catch((err) => {
         console.error(`Package failed the check`, err)
-        return 1;
+        const reportContent = JSON.stringify({
+            grade: 'C',
+            comments: `:robot:
+Package check failed on Travis.
+
+[see more](https://travis-ci.org/ISNIT0/npm-package-tester/branches)
+
+\`\`\`
+${JSON.stringify(err, null, '\t')}
+\`\`\`
+`
+        }, null, '\t');
+        return repo.writeFile('master', reportDirectory, reportContent, `:rotating_light: Automatically applying 'F' grade`, {});
     })
-    .then((exitCode) => {
-        process.exit(exitCode);
-    });
 
 function getPackageVersionUrl(package, version) {
     return `http://registry.npmjs.com/${package}/${version}`;
