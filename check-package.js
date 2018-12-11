@@ -10,15 +10,15 @@ const package = require('./test.json');
 
 doCheck(package)
     .then(() => {
-        console.log(`Successfully checked packages and saved output`);
-        process.exit(0);
+        console.log(`Package passed the check`);
+        return 0;
     })
     .catch((err) => {
-        console.error(`Failed to check packages`, err)
-        process.exit(1);
+        console.error(`Package failed the check`, err)
+        return 1;
     })
-    .then(() => {
-        // TODO: Callback to update DB
+    .then((exitCode) => {
+        process.exit(exitCode);
     });
 
 function getPackageVersionUrl(package, version) {
@@ -74,6 +74,7 @@ async function doCheck({ packageName, version }) {
 
     } catch (err) {
         console.error(`Error verifying [${packageName}]:`, err);
+        throw err;
     } finally {
         console.info(`Clearing up [${packageName}]`);
         // await deleteDir(dirPath);
