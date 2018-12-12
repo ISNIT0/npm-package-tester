@@ -8,11 +8,13 @@ const path = require('path');
 const _exec = require('child_process').exec;
 const package = require('./test.json');
 const Repository = require('github-api/dist/components/Repository');
+const Issue = require('github-api/dist/components/Issue');
 
 const { WEBHOOK_TOKEN, GITHUB_TOKEN } = process.env;
 const repo = new Repository('ISNIT0/safe-npm-packages', {
     token: GITHUB_TOKEN
 });
+const issue = new Issue('ISNIT0/safe-npm-packages', { token: GITHUB_TOKEN });
 
 const reportDirectory = `reports/${package.packageName}/${package.version}.json`;
 
@@ -34,7 +36,7 @@ Package check passed on Travis.
     .catch(async (diffs) => {
         console.error(`Package failed the check`, diffs)
         const reportContent = JSON.stringify({
-            grade: 'C',
+            grade: 'F',
             comments: `:robot:
 Package check failed on Travis.
 
@@ -47,10 +49,14 @@ ${JSON.stringify(diffs, null, '\t')}
         }, null, '\t');
         await repo.writeFile('master', reportDirectory, reportContent, `:rotating_light: Automatically applying 'F' grade`, {});
 
-
         await axios.get(`https://safenpm.herokuapp.com/report/update/${WEBHOOK_TOKEN}/${package.packageName}/${package.version}`);
 
-        // TODO: create GitHub issue
+        await issue.createIssue({
+            title: `:robot: :rotating_light: Please verify auto check for [${package.packageName}@${package.version}]`,
+            body: reportContent.comments,
+            assignees: ['ISNIT0'],
+            labels: ['auto-fail']
+        });
     })
     .catch(err => {
         console.error(`Died with:`, err);
