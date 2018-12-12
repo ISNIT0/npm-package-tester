@@ -47,16 +47,31 @@ ${JSON.stringify(diffs, null, '\t')}
 \`\`\`
 `
         }, null, '\t');
-        await repo.writeFile('master', reportDirectory, reportContent, `:rotating_light: Automatically applying 'F' grade`, {});
+        try {
+            await repo.writeFile('master', reportDirectory, reportContent, `:rotating_light: Automatically applying 'F' grade`, {});
+        } catch (err) {
+            console.error(`Failed to update file [${reportDirectory}]`);
+            process.exit(1);
+        }
 
-        await axios.get(`https://safenpm.herokuapp.com/report/update/${WEBHOOK_TOKEN}/${package.packageName}/${package.version}`);
+        try {
+            await axios.get(`https://safenpm.herokuapp.com/report/update/${WEBHOOK_TOKEN}/${package.packageName}/${package.version}`);
+        } catch (err) {
+            console.error(`Failed to call webhook`);
+            process.exit(1)
+        }
 
-        await issue.createIssue({
-            title: `:robot: :rotating_light: Please verify auto check for [${package.packageName}@${package.version}]`,
-            body: reportContent.comments,
-            assignees: ['ISNIT0'],
-            labels: ['auto-fail']
-        });
+        try {
+            await issue.createIssue({
+                title: `Please verify auto check for [${package.packageName}@${package.version}]`,
+                body: reportContent.comments,
+                assignees: ['ISNIT0'],
+                labels: ['auto-fail']
+            });
+        } catch (err) {
+            console.error(`Failed to create GitHub issue`);
+            process.exit(1)
+        }
     })
     .catch(err => {
         console.error(`Died with:`, err);
