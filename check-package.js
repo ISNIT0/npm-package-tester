@@ -18,6 +18,24 @@ const issue = new Issue('ISNIT0/safe-npm-packages', { token: GITHUB_TOKEN });
 
 const reportDirectory = `reports/${package.packageName}/${package.version}.json`;
 
+if (!('toJSON' in Error.prototype)) {
+    // Hack to allow stringifying errors.
+    // https://stackoverflow.com/questions/18391212/is-it-not-possible-to-stringify-an-error-using-json-stringify
+    Object.defineProperty(Error.prototype, 'toJSON', {
+        value: function () {
+            var alt = {};
+
+            Object.getOwnPropertyNames(this).forEach(function (key) {
+                alt[key] = this[key];
+            }, this);
+
+            return alt;
+        },
+        configurable: true,
+        writable: true
+    });
+}
+
 doCheck(package)
     .then(async () => {
         console.log(`Package passed the check`);
