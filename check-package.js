@@ -60,11 +60,18 @@ ${JSON.stringify(diffs, null, '\t')}
             console.error(`Failed to call webhook`);
             process.exit(1)
         }
-
+        const backTicks = '```';
         try {
             await issue.createIssue({
                 title: `Please verify auto check for [${package.packageName}@${package.version}]`,
-                body: reportContent.comments,
+                body: `## :robot: Failed to verify package [${package.packageName}@${package.version}]
+
+Check the output on [Travis](https://travis-ci.org/ISNIT0/npm-package-tester/branches)
+
+${backTicks}
+${JSON.stringify(diffs, null, '\t')}
+${backTicks}
+`,
                 assignees: ['ISNIT0'],
                 labels: ['auto-fail']
             });
