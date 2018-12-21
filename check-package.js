@@ -21,11 +21,13 @@ const reportDirectory = `reports/${package.packageName}/${package.version}.md`;
 
 const reportTemplate = ({ grade, message }) => {
     return `:robot: ${grade === 'F' ? ':rotating_light:' : ''}
-    | Grade | ${grade} |
-    | Tested At | ${new Date().toUTCString()} |
-    | Travis Build | [${TRAVIS_BUILD_ID}](https://travis-ci.org/ISNIT0/npm-package-tester/builds/${TRAVIS_BUILD_ID}) |
+| Field | Output |
+|----|----|
+| Grade | ${grade} |
+| Tested At | ${new Date().toUTCString()} |
+| Travis Build | [${TRAVIS_BUILD_ID}](https://travis-ci.org/ISNIT0/npm-package-tester/builds/${TRAVIS_BUILD_ID}) |
     
-    ${message}
+${message}
     `;
 }
 
