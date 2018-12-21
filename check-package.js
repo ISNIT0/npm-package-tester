@@ -28,11 +28,20 @@ const reportTemplate = ({ grade, message }) => {
 | Field | Output |
 |----|----|
 | Grade | ${grade} |
-| Tested At | ${new Date().toUTCString()} |
+| Report At | ${new Date().toUTCString()} |
+| Report By | :robot: |
 | Travis Build | [${TRAVIS_BUILD_ID}](https://travis-ci.org/ISNIT0/npm-package-tester/builds/${TRAVIS_BUILD_ID}) |
     
-${message}
-    `;
+- [ ] No suspicious file reads
+- [ ] No suspicious network requests
+- [ ] No suspicious dependencies
+- [ ] No suspicious maintainers
+- [ ] Has passed automatic test
+- [ ] Has security policy
+
+## Comments
+> ${message}
+`;
 }
 
 if (!('toJSON' in Error.prototype)) {
