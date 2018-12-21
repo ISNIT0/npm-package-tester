@@ -16,7 +16,7 @@ const repo = new Repository('ISNIT0/safe-npm-packages', {
 });
 const issue = new Issue('ISNIT0/safe-npm-packages', { token: GITHUB_TOKEN });
 
-const reportDirectory = `reports/${package.packageName}/${package.version}.json`;
+const reportDirectory = `reports/${package.packageName}/${package.version}.md`;
 
 
 const reportTemplate = ({ grade, message }) => {
