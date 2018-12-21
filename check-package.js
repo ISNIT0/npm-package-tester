@@ -10,13 +10,24 @@ const package = require('./test.json');
 const Repository = require('github-api/dist/components/Repository');
 const Issue = require('github-api/dist/components/Issue');
 
-const { WEBHOOK_TOKEN, GITHUB_TOKEN } = process.env;
+const { WEBHOOK_TOKEN, GITHUB_TOKEN, TRAVIS_BUILD_ID } = process.env;
 const repo = new Repository('ISNIT0/safe-npm-packages', {
     token: GITHUB_TOKEN
 });
 const issue = new Issue('ISNIT0/safe-npm-packages', { token: GITHUB_TOKEN });
 
 const reportDirectory = `reports/${package.packageName}/${package.version}.json`;
+
+
+const reportTemplate = ({ grade, message }) => {
+    return `:robot: ${grade === 'F' ? ':rotating_light:' : ''}
+    | Grade | ${grade} |
+    | Tested At | ${new Date().toUTCString()} |
+    | Travis Build | [${TRAVIS_BUILD_ID}](https://travis-ci.org/ISNIT0/npm-package-tester/builds/${TRAVIS_BUILD_ID}) |
+    
+    ${message}
+    `;
+}
 
 if (!('toJSON' in Error.prototype)) {
     // Hack to allow stringifying errors.
@@ -39,9 +50,9 @@ if (!('toJSON' in Error.prototype)) {
 doCheck(package)
     .then(async () => {
         console.log(`Package passed the check`);
-        const reportContent = JSON.stringify({
+        const reportContent = reportTemplate({
             grade: 'C',
-            comments: `:robot:
+            message: `
 Package check passed on Travis.
 
 [see more](https://travis-ci.org/ISNIT0/npm-package-tester/branches)
@@ -53,10 +64,9 @@ Package check passed on Travis.
     })
     .catch(async (diffs) => {
         console.error(`Package failed the check`, diffs)
-        const reportContent = JSON.stringify({
+        const reportContent = reportTemplate({
             grade: 'F',
-            comments: `:robot:
-Package check failed on Travis.
+            message: `Package check failed on Travis.
 
 [see more](https://travis-ci.org/ISNIT0/npm-package-tester/branches)
 
@@ -84,7 +94,7 @@ ${JSON.stringify(diffs, null, '\t')}
                 title: `Please verify auto check for [${package.packageName}@${package.version}]`,
                 body: `## :robot: Failed to verify package [${package.packageName}@${package.version}]
 
-Check the output on [Travis](https://travis-ci.org/ISNIT0/npm-package-tester/branches)
+Check the report here: [${reportDirectory}](${reportDirectory})
 
 ${backTicks}
 ${JSON.stringify(diffs, null, '\t')}
