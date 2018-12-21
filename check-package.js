@@ -21,6 +21,7 @@ const reportDirectory = `reports/${package.packageName}/${package.version}.md`;
 
 const reportTemplate = ({ grade, message }) => {
     return `:robot: ${grade === 'F' ? ':rotating_light:' : ''}
+
 | Field | Output |
 |----|----|
 | Grade | ${grade} |
