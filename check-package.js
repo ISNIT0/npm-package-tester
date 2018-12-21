@@ -1,5 +1,6 @@
 const axios = require('axios');
 const git = require('simple-git/promise');
+const dayjs = require('dayjs');
 const uuid = require('uuid/v4');
 const fs = require('graceful-fs');
 const crypto = require('crypto');
@@ -16,7 +17,9 @@ const repo = new Repository('ISNIT0/safe-npm-packages', {
 });
 const issue = new Issue('ISNIT0/safe-npm-packages', { token: GITHUB_TOKEN });
 
-const reportDirectory = `reports/${package.packageName}/${package.version}.md`;
+const testDateTime = dayjs().format('DD-MM-YYYY__HH_mm');
+
+const reportDirectory = `${package.packageName}/${package.version}/${testDateTime}.md`;
 
 
 const reportTemplate = ({ grade, message }) => {
