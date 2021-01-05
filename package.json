@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/ISNIT0/npm-package-tester#readme",
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "crypto": "^1.0.1",
     "dayjs": "^1.7.8",
     "diff": "^3.5.0",
